@@ -1,5 +1,5 @@
 ### python3中由于使用的是Unicode编码，而ctype中的printf无法使用；所以需要编码处理
-###有三种方式
+### 有三种方式
 
 #### 转为byte类型 在字符串前面加b
 ###### message_string = b"Hello world!\n"
@@ -11,4 +11,3 @@
 ###### message_string = "Hello world!\n"
 ###### result = message_string.encode("utf-8")
 ###### msvcrt.printf(result)
-
