@@ -7,7 +7,7 @@ class debugger():
     def __int__(self):
         self.h_process = None
         self.pid = None
-        self.debugger_active = None
+        self.debugger_active = False
 
     def load(self,path_to_exe):
         # 参数 dwCreationFlags 中的标志位控制着进程的创建方式，你若希望
@@ -80,9 +80,9 @@ class debugger():
             # 这里我们只是简单的恢复执行目标进程
             input("press a key to continue...")
             self.debugger_active = False
-            kernel32.ContinueDebugEvent(
-                debug_event.dwProcessId,
-                debug_event.dwThreadId,
+            kernel32.ContinueDebugEvent(\
+                debug_event.dwProcessId,\
+                debug_event.dwThreadId,\
                 continue_status
             )
 
