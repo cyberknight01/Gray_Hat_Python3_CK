@@ -140,9 +140,61 @@ typedef struct tagTHREADENTRY32 {
 } THREADENTRY32;
 ```
 
+##### 检索指定线程的上下文信息
+```cython
+BOOL WINAPI GetThreadContext(
+  HANDLE    hThread,                //要获取上下文的线程的句柄。句柄必须具有THREAD_GET_CONTEXT对线程的访问权限
+  LPCONTEXT lpContext               //指向CONTEXT结构的指针，该结构接收指定线程的适当上下文
+);
+WOW64：  句柄还必须具有THREAD_QUERY_INFORMATION访问权限
+如果函数成功，则返回值为非零
+如果函数失败，则返回值为零
+```
+##### 设置指定线程的上下文；64位应用程序可以使用Wow64SetThreadContext函数设置WOW64线程的上下文 
+```cython
+BOOL SetThreadContext(
+  HANDLE        hThread,
+  const CONTEXT *lpContext          //指向CONTEXT结构的指针，该结构包含要在指定线程中设置的上下文
+);
+```
+##### 包含处理器特定的寄存器数据，系统使用 CONTEXT结构执行各种内部操作
+***这个结构体很重要，务必掌握***
+```cython
+typedef struct _CONTEXT
+{
+    DWORD           ContextFlags    // -|               +00h
+    DWORD           Dr0             //  |               +04h
+    DWORD           Dr1             //  |               +08h
+    DWORD           Dr2             //  >调试寄存器       +0Ch
+    DWORD           Dr3             //  |               +10h
+    DWORD           Dr6             //  |               +14h
+    DWORD           Dr7             // -|               +18h
 
+    FLOATING_SAVE_AREA FloatSave;   //浮点寄存器区        +1Ch~~~88h
+    DWORD           SegGs           //-|                +8Ch
+    DWORD           SegFs           // |\段寄存器         +90h
+    DWORD           SegEs           // |/               +94h
+    DWORD           SegDs           //-|                +98h
 
+    DWORD           Edi             //________          +9Ch
+    DWORD           Esi             // |  通用          +A0h
+    DWORD           Ebx             // |   寄           +A4h
+    DWORD           Edx             // |   存           +A8h
+    DWORD           Ecx             // |   器           +ACh
+    DWORD           Eax             //_|___组_          +B0h
 
+    DWORD           Ebp             //++++++            +B4h
+    DWORD           Eip             // |控制            +B8h
+    DWORD           SegCs           // |寄存            +BCh
+    DWORD           EFlag           // |器组            +C0h
+    DWORD           Esp             // |                +C4h
+    DWORD           SegSs           //++++++            +C8h
+
+    BYTE    ExtendedRegisters[MAXIMUM_SUPPORTED_EXTENSION];
+} CONTEXT;
+typedef     CONTEXT     *PCONTEXT;
+#define     MAXIMUM_SUPPORTED_EXTENSION     512
+```
 
 
 
@@ -150,5 +202,5 @@ typedef struct tagTHREADENTRY32 {
 在Python3中，使用数字的时候就需要自己来进行转换了，在让用户输入数字的时候一定切忌要进行转换，如果我们要使用数字的化。  
 
 在Windows10中，打开计算器需要计算器显示在桌面或前台，当进入到后台或放到任务栏，通过进程查看是挂起状态，会导致试失败  
-
-
+  
+在3.2节中注释掉run()之后，虽然可以运行my_test脚本了，但是读出寄存器有问题，都是0值
