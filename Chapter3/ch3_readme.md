@@ -86,35 +86,59 @@ BOOL WINAPI ContinueDebugEvent(
 ##### 停止调试器调试指定的进程
 ```python
 BOOL WINAPI DebugActiveProcessStop(
-  DWORD dwProcessId
+  DWORD dwProcessId                 //停止调试的进程的标识符
 );
+如果函数成功，则返回值为非零
+如果函数失败，则返回值为零
 ```
 
 #### 3.2 获取寄存器状态信息
 ##### 获取线程的句柄函数
 ```cython
 HANDLE WINAPI OpenThread(
-  DWORD dwDesiredAccess,
-  BOOL  bInheritHandle,
-  DWORD dwThreadId
+  DWORD dwDesiredAccess,            //对线程对象的访问权限。线程的安全描述符检查此访问权限，此参数可以是一个或多个线程访问权限
+  BOOL  bInheritHandle,             //如果该值为TRUE，则此进程创建的进程将继承该句柄。否则，进程将不会继承此句柄
+  DWORD dwThreadId                  //要打开的线程的标识符
 );
+如果函数成功，则返回值是指定线程的打开句柄
+如果函数失败，则返回值为NULL
 ```
 
 ##### 线程枚举，拍摄指定进程以及这些进程使用的堆，模块和线程的快照
 ```cython
 HANDLE WINAPI CreateToolhelp32Snapshot(
-  DWORD dwFlags,
-  DWORD th32ProcessID
+  DWORD dwFlags,                    //快照中要包括的系统信息部分，是线程列表，进程列表，模块列表还是堆列表，具体可查MSDN
+  DWORD th32ProcessID               //要包含在快照中的进程的进程标识符。此参数可以为零以指示当前进程，具体可查MSDN
 );
 ```
 ##### 检索有关系统快照中遇到的任何进程的第一个线程的信息
 ```cython
 BOOL WINAPI Thread32First(
+  HANDLE          hSnapshot,        //从上一次调用CreateToolhelp32Snapshot函数返回的快照的 句柄
+  LPTHREADENTRY32 lpte              //指向THREADENTRY32结构的指针
+);
+```
+
+##### 检索有关系统内存快照中遇到的任何进程的下一个线程的信息
+```cython
+BOOL WINAPI Thread32Next(
   HANDLE          hSnapshot,
   LPTHREADENTRY32 lpte
 );
 ```
 
+##### 这个结构体包含枚举到的首个线程的相关信息
+```cython
+typedef struct tagTHREADENTRY32 {
+  DWORD dwSize;                     //结构的大小，以字节为单位
+  DWORD cntUsage;                   //该成员不再使用，并且始终设置为零
+  DWORD th32ThreadID;               //线程标识符，与CreateProcess函数返回的线程标识符兼容
+  DWORD th32OwnerProcessID;         //创建线程的进程的标识符
+  LONG  tpBasePri;                  //分配给线程的内核基本优先级。优先级是从0到31的数字，0表示最低的线程优先级
+  LONG  tpDeltaPri;                 //该成员不再使用，并且始终设置为零
+  DWORD dwFlags;                    //该成员不再使用，并且始终设置为零
+} THREADENTRY32;
+```
 
 
 
