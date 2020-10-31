@@ -39,3 +39,5 @@ BOOL WINAPI DebugActiveProcessStop(
   DWORD dwProcessId
 );
 ```
+
+在Python3中是没有raw_input()函数的，只有input()函数，input()无论输入数字和文本，输出都是文本，在Python3中，使用数字的时候就需要自己来进行转换了，在让用户输入数字的时候一定切忌要进行转换，如果我们要使用数字的化。
